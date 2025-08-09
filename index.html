@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Infinite Screaming Machine</title>
+  <style>
+    body {
+      background: black;
+      color: white;
+      font-family: monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+    }
+    button {
+      font-size: 2rem;
+      padding: 1rem 2rem;
+      margin-top: 20px;
+      background-color: red;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>😱 Infinite Screaming Machine</h1>
+  <button onclick="scream()">SCREAM</button>
+
+  <script>
+    const context = new (window.AudioContext || window.webkitAudioContext)();
+    let screamCount = 0;
+
+    async function scream() {
+      try {
+        const response = await fetch("scream-90747.mp3"); // Ensure this file exists
+        const arrayBuffer = await response.arrayBuffer();
+        const audioBuffer = await context.decodeAudioData(arrayBuffer);
+
+        const source = context.createBufferSource();
+        source.buffer = audioBuffer;
+
+        const gain = context.createGain();
+        gain.gain.value = 0.5 + screamCount * 0.2;
+
+        const playbackRate = 1 + (Math.random() * 0.2);
+        source.playbackRate.value = playbackRate;
+
+        source.connect(gain).connect(context.destination);
+        source.start();
+
+        screamCount++;
+      } catch (error) {
+        console.error("Error playing scream:", error);
+      }
+    }
+
+    document.addEventListener("keydown", () => {
+      scream();
+    });
+  </script>
+</body>
+</html>
